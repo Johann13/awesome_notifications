@@ -20,7 +20,6 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[0030676221]" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -38,6 +37,8 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHOW_ALL_PROCESSES" value="false" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
     <property name="dart.analysis.tool.window.force.activate" value="false" />
     <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="io.flutter.reload.alreadyRun" value="true" />
@@ -60,6 +61,7 @@
       <recent name="E:\plugins\awesome_notifications\lib\src\extensions" />
     </key>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -70,8 +72,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1598452289782</updated>
+      <workItem from="1604930495728" duration="1547000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -154,9 +160,10 @@
       <screen x="0" y="0" width="2560" height="1040" />
     </state>
     <state width="1288" height="528" key="XDebugger.FullValuePopup/0.0.2560.1040/451.-900.1600.900@0.0.2560.1040" timestamp="1603240623241" />
-    <state x="876" y="100" width="964" height="606" key="find.popup" timestamp="1604788441535">
-      <screen x="0" y="0" width="2560" height="1040" />
+    <state x="438" y="69" width="549" height="534" key="find.popup" timestamp="1604933013489">
+      <screen x="0" y="0" width="1280" height="720" />
     </state>
+    <state x="438" y="69" width="549" height="534" key="find.popup/0.0.1280.720@0.0.1280.720" timestamp="1604933013489" />
     <state x="876" y="100" width="964" height="606" key="find.popup/0.0.2560.1040/451.-900.1600.900/2560.0.1920.1080@0.0.2560.1040" timestamp="1604741082795" />
     <state x="876" y="100" width="964" height="606" key="find.popup/0.0.2560.1040/451.-900.1600.900@0.0.2560.1040" timestamp="1603733355487" />
     <state x="876" y="100" width="964" height="606" key="find.popup/451.-900.1600.860/0.0.2560.1040@0.0.2560.1040" timestamp="1604788441535" />

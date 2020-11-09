@@ -13,7 +13,7 @@
     <uses-permission android:name="com.htc.launcher.permission.UPDATE_SHORTCUT" />
 
     <application>
-
+        <!--
         <service
             android:name=".services.firebase.FCMService"
             android:exported="false">
@@ -29,6 +29,7 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="me.carda.awesome_notifications.firebase.background_channel"/>
+        -->
 
         <receiver android:name=".notifications.broadcastReceivers.DismissedNotificationReceiver"/>
         <receiver android:name=".notifications.broadcastReceivers.ScheduledNotificationReceiver"/>
