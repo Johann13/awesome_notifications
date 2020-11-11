@@ -72,7 +72,7 @@ Considering all the many different devices available, with different hardware an
 
 Also, the Notification Channels follows the same rule. If there is no channel segregation of notifications, use the channel configuration as only defaults configuration. If the device has channels, use it as expected to be.
 
-And all notifications sent while the app was killed are registered and delivered as soon as possible to the Application, after the plugin initialziation, respecting the delivery order.
+And all notifications sent while the app was killed are registered and delivered as soon as possible to the Application, after the plugin initialization, respecting the delivery order.
 
 This way, your Application will receive **all notifications at Flutter level code**.
 
@@ -85,7 +85,7 @@ This way, your Application will receive **all notifications at Flutter level cod
 1. Add *awesome_notifications* as a dependency in your pubspec.yaml file.
 
 ```yaml
-  awesome_notifications: any
+awesome_notifications: any # Any attribute updates automatically your source to the last version
 ```
 
 2. import the plugin package to your dart code
@@ -98,7 +98,8 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 
 ```dart
 AwesomeNotifications().initialize(
-    'resource://drawable/app_icon',
+    // set the icon to null if you want to use the default app icon
+    'resource://drawable/res_app_icon',
     [
         NotificationChannel(
             channelKey: 'basic_channel',
@@ -117,6 +118,7 @@ AwesomeNotifications().initialize(
 AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
   if (!isAllowed) {
     // Insert here your friendly dialog box before call the request method
+    // This is very important to not harm the user experience
     AwesomeNotifications().requestPermissionToSendNotifications();
   }
 });
@@ -127,12 +129,12 @@ AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
 ```dart
 AwesomeNotifications().actionStream.listen(
     (receivedNotification){
-    
+
         Navigator.of(context).pushName(context,
             '/NotificationPage',
             arguments: { id: receivedNotification.id } // your page params. I recommend to you to pass all *receivedNotification* object
         );
-    
+
     }
 );
 ```
@@ -154,47 +156,74 @@ AwesomeNotifications().createNotification(
 
 <br>
 
+## Example Apps
+
+<br>
+
+With the examples bellow, you can check all the features and how to use the Awesome Notifications in your app.
+
+https://github.com/rafaelsetragni/awesome_notifications <br>
+Complete example with all the features available
+
+https://github.com/bayuramadeza/Awesome-Notification-FCM <br>
+An simple but excellent app example of how to implement FCM with Awesome Notifications, created by [bayuramadeza](https://github.com/bayuramadeza/Awesome-Notification-FCM/commits?author=bayuramadeza)
+
+To run the examples, follow the steps bellow:
+
+1. Install GitHub software in your local machine. I strongly recommend to use [GitHub Desktop](https://desktop.github.com/).
+2. Go to one of the GitHub repositories
+3. Clone the project to your local machine
+4. Open the project with Android Studio or any other IDE
+5. Sync the project dependencies running `flutter pub get`
+6. On iOS, run `pod install` to sync the native dependencies
+7. Debug the application with a real device or emulator
+
+<br>
+
 ## iOS Limitations
 
 Due to the way that background task and notification schedules works on iOS, wasn't possible yet to enable all the schedule features on iOS while the app is in Background and even when the app is terminated (Killed).
 
 On Foreground, all notification schedules should work as expected. `InitialDate` parameter should work as expected at any circunstance.
 
-A support ticket was opened for Apple in order to resolve this issue. You can follow the progress of the process [here](https://github.com/rafaelsetragni/awesome_notifications/issues/16). 
+A support ticket was opened for Apple in order to resolve this issue. You can follow the progress of the process [here](https://github.com/rafaelsetragni/awesome_notifications/issues/16).
 
 <br>
 <br>
 
-## iOS Extra Configurations (Optional)
+## iOS Extra Configurations
 
-To activate all the features on iOS, is necessary to include two target extensions to your project:
+To activate all the features on iOS, is necessary to include two target extensions in your project:
 
 - **Notification Content Extension**: allows to use alternative layouts, such as Big text, Progress Bar and Inbox Messages.
 - **Notification Service Extension**: allows to receive push notifications using all Awesome Notifications Features.
 
-OBS: Is not necessary to include both extensions if you do not pretend to use just one of the features. Just include what you need.
+OBS: Is not necessary to include both extensions if you pretend to use just one of the features. Just include what you need.
 
 <br>
 
-#### *Including Notification Service Extension to your project*
+### *Including Notification Target Extensions in your project*
+<br>
 
 1- Open your project directly on XCode, opening the file "/{path-to-your-project}/ios/Runner.xcworkspace"
 
 2- Create a new target for Notification Service Extension with **File > New > Target** and select **Notification Service Extension**. Name the extension as **AwesomeServiceExtension**.
+<br>
+
 ![](https://raw.githubusercontent.com/rafaelsetragni/awesome_notifications/master/example/assets/readme/add-notification-service-extension.jpg)
 
-3- Edit your Podfile in XCode and insert the code bellow at the bottom of the file:
+3- Create a new target for Notification Content Extension with **File > New > Target** and select **Notification Content Extension**. Name the extension as **AwesomeContentExtension**.
+<br>
+
+![](https://raw.githubusercontent.com/rafaelsetragni/awesome_notifications/master/example/assets/readme/add-notification-content-extension.jpg)
+
+4- Edit your Podfile in XCode and insert the code bellow at the bottom of the file:
 <br>
 *This step will compile the framework awesome_notifications to be used on your target extensions*
 
 <br>
 
-```
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
-  end
-end
+```pod
 
 target 'AwesomeServiceExtension' do
   use_frameworks!
@@ -209,6 +238,7 @@ target 'AwesomeContentExtension' do
 
   pod 'awesome_notifications', :path => '.symlinks/plugins/awesome_notifications/ios'
 end
+
 ```
 
 <br>
@@ -221,46 +251,63 @@ end
 
 <br>
 
-```Swift
-import UserNotifications
+```swift
 import awesome_notifications
 
 @available(iOS 10.0, *)
-class NotificationService: UNNotificationServiceExtension {
-    
-    var awesomeServiceExtension:AwesomeServiceExtension?
-    
-    override func didReceive(
-        _ request: UNNotificationRequest,
-        withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
-    ){
-        self.awesomeServiceExtension = AwesomeServiceExtension()
-        awesomeServiceExtension?.didReceive(request, withContentHandler: contentHandler)
-    }
-    
-    override func serviceExtensionTimeWillExpire() {
-        if let awesomeServiceExtension = awesomeServiceExtension {
-            awesomeServiceExtension.serviceExtensionTimeWillExpire()
-        }
-    }
+class NotificationService: AwesomeServiceExtension {
 
 }
 ```
 <br>
 
-7- Certifies to disable `Enable Bitcode` and `Require Only App-Extension-Safe API` setting it to `'NO'`
+7- Replace the file content in NotificationContent.swift by the code bellow:
+
+<br>
+
+```swift
+import awesome_notifications
+
+@available(iOS 10.0, *)
+class NotificationViewController: AwesomeContentExtension {
+
+}
+```
+<br>
+
+8- Using XCode, inside the ios folder open your project file `Runner.xcworkspace`. Than go to *Runner > Signing & Capabilities* and add **App Groups**, **Push Notifications** and **Background Modes**, with `Background fetch`, `Remote notifications` and `Background processing` checked.
+
+<br>
+
+9- For **Runner**, **AwesomeServiceExtension** and **AwesomeContentExtension** Targets, go to *Signing & Capabilities > App Groups* and add the group "group.AwesomeNotifications.*your.bundle.domain.appName*"
+<br>
+
+![](https://raw.githubusercontent.com/rafaelsetragni/awesome_notifications/master/example/assets/readme/xcode-signing-and-capabilities.jpg)
+
+
+OBS: the App Group identifier is case sensitive and MUST be exactely the same as your app bundle. In every plugin initialization on iOS, your app group is debug printed in your terminal with the text: 
+
+> "Awesome Notifications - App Group : group.AwesomeNotifications.*your.bundle.domain.appName*"
+
+<br>
+
+You can manage your app groups as show in the tutorial bellow:
+<br>
+https://www.appcoda.com/app-group-macos-ios-communication/
+
+<br>
+
+10- Go to **Runner > Build Settings** and certifies to disable `Enable Bitcode` and `Require Only App-Extension-Safe API`, setting it to `'NO'` in both extensions.
+<br>
+
 ![](https://raw.githubusercontent.com/rafaelsetragni/awesome_notifications/master/example/assets/readme/disable-bitcode.jpg)
 
 <br>
 
-
-#### *Including Notification Content Extension to your project*
-
-WORK IN PROGRESS
+ATTENTION: WORK IN PROGRESS FOR NOTIFICATION CONTENT EXTENSION
 
 <br>
 <br>
-
 
 ## Using Firebase Services (Optional)
 
@@ -272,7 +319,7 @@ First things first, to create your Firebase Cloud Message and send notifications
 
 After that, go to "Cloud Messaging" option and add an "Android app", put the packge name of your project (**certifies to put the correct one**) to generate the file ***google-services.json***.
 
-Download the file and place it inside your android/app folder.
+Download the file and place it inside your [app]/android/app/ folder.
 
 ![](https://raw.githubusercontent.com/rafaelsetragni/awesome_notifications/master/example/assets/readme/google-json-path.jpg)
 
@@ -293,22 +340,20 @@ Add the apply plugin to the [project]/android/app/build.gradle file.
 apply plugin: 'com.google.gms.google-services'
 ```
 
-```Dart
-dependencies {
-    classpath 'com.android.tools.build:gradle:3.5.0'
-    // Add the google services classpath
-    classpath 'com.google.gms:google-services:4.3.3'
-}
-```
-
 <br>
 
 ### *iOS*
 
-In construction... 
+Go to "Cloud Messaging" option and add an "iOS app", put the packge name of your project (**certifies to put the correct one**) to generate the file ***GoogleService-info.plist***.
 
-I will deploy the other platforms as soon as possible. Im doing all by my own, with a lack of resources.
-Please, be patient.
+Download the file and place it inside your [app]/ios/Runner/ folder using XCode. (Do not use Finder to copy and paste the file)
+
+![](https://raw.githubusercontent.com/rafaelsetragni/awesome_notifications/master/example/assets/readme/google-plist-path.jpg)
+
+After, in your Google Console, go to **General (Gear icon) -> Cloud Messaging -> iOS configuration** and send your **APNs key** and include your **iOS Team ID**. To generate your APNs keys, follow the tutorial bellow:
+
+https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/auth-key/
+
 
 <br>
 
@@ -317,13 +362,6 @@ Please, be patient.
 The firebase token is necessary to your sever send Push Notifications to the remote device. The token could eventually change and is created to every device installation on each application.
 
 Every token created could be captured on Flutter by this plugin listen to `tokenStream`.
-
-<br>
-
-## Error: Invalid Firebase notification content
-
-The notification sent via FCM services *MUST* respect the types of the respective Notification elements. Otherwise, your notification will be discarded as invalid one.
-Also, all the payload elements *MUST* be a String, as the same way as you do in Local Notifications.
 
 <br>
 
@@ -346,8 +384,8 @@ The Flutter code will be called as soon as possible using [Dart Streams](https:/
 
 <br>
 
-|                             | App in Foreground | App in Background | App Terminated (Killed) |
-| --------------------------: | ----------------- | ----------------- | -------------- |
+| Platform    | App in Foreground | App in Background | App Terminated (Killed) |
+| ----------: | ----------------- | ----------------- | ----------------------- |
 | **Android** | Fires all streams immediately after occurs | Fires all streams immediately after occurs | Fires `createdStream`, `displayedStream` and `dismissedStream` after the plugin initializes on Foreground, but fires `actionStream` immediately after occurs |
 | **iOS**     | Fires all streams immediately after occurs | Fires `createdStream`, `displayedStream` and `dismissedStream` after the app returns to Foreground, but fires `actionStream` immediately after occurs | Fires `createdStream`, `displayedStream` and `dismissedStream` after the plugin initializes on Foreground, but fires `actionStream` immediately after occurs |
 
@@ -359,7 +397,7 @@ The Flutter code will be called as soon as possible using [Dart Streams](https:/
 
 To show any images on notification, at any place, you need to include the respective source prefix before the path.
 
-Images can be defined using 4 prefix types:
+Layouts can be defined using 4 prefix types:
 
 - Default: The default layout. Also is the layout used in case of any failure found on other ones
 - BigPicture: Is the layout that shows a big picture and/or a small image.
@@ -380,9 +418,11 @@ Images can be defined using 4 prefix types:
 - Asset: images access through Flutter asset method. **Example**: asset://path/to/image-asset.png
 - Network: images access through internet connection. **Example**: http(s)://url.com/to/image-asset.png
 - File: images access through files stored on device. **Example**: file://path/to/image-asset.png
-- Resource: images access through drawable native resources. On Android, those files are stored inside [project]/android/app/src/main/res folder. **Example**: resource://url.com/to/image-asset.png
+- Resource: images access through drawable native resources. On Android, those files are stored inside [project]/android/app/src/main/drawabe folder. **Example**: resource://drawable/res_image-asset.png
 
-OBS: Unfortunately, icons can be only resource media types.
+OBS: Unfortunately, icons and sounds can be only resource media types.
+OBS 2: To protect your native resources on Android against minification, please include the prefix "res_" in your resource file names. The use of the tag `shrinkResources false` inside build.gradle or the command `flutter build apk --no-shrink` is not recommended.
+To know more about it, please visit [Shrink, obfuscate, and optimize your app](https://developer.android.com/studio/build/shrink-code)
 
 <br>
 
@@ -435,15 +475,20 @@ OBS: All dates are set to use UTC timezone.
 ## How to send Push Notifications using Firebase Cloud Messaging (FCM)
 
 To send a notification using Awesome Notifications and FCM Services, you need to send a POST request to the address https://fcm.googleapis.com/fcm/send.
-Due to limitations on Notification body, you should use only the data field as bellow:
+Due to limitations on Android and iOS, you should send a empty **notification** field and use only the **data** field to send your data, as bellow:
 
 OBS: `actionButtons` and `schedule` are **optional**
+<br>
+OBS 2: you should not implement any native code to use FCM with Awesome Notifications. All of then was already implemented inside the plugin.
+<br>
 
 ```json
 {
     "to" : "[YOUR APP TOKEN]",
     "mutable_content" : true,
-    "content_available": true,
+    "notification": {
+        "title": " "
+    },
     "data" : {
         "content": {
             "id": 100,
@@ -481,5 +526,74 @@ OBS: `actionButtons` and `schedule` are **optional**
 ```
 
 You can download a example of how to send Push Notifications through FCM using "Postman" [here](https://raw.githubusercontent.com/rafaelsetragni/awesome_notifications/master/example/assets/readme/Firebase_FCM_Example.postman_collection.json)
+
+<br>
+
+## Error: "Invalid notification content"
+
+The notification sent via FCM services *MUST* respect the types of the respective Notification elements. Otherwise, your notification will be discarded as invalid one.
+Also, all the payload elements *MUST* be a String, as the same way as you do in Local Notifications using dart code.
+
+<br>
+<br>
+
+## Notification types, values and defaults
+<br>
+
+### NotificationContent ("content" in Push data) - (required)
+<br>
+
+| Attribute          	| Required | Description                                                              | Type                  | Value Limits            | Default value             |
+| --------------------- | -------- | ------------------------------------------------------------------------ | --------------------- | ----------------------- | ------------------------- |
+| id 			     	|    YES   | Number that identifies a unique notification                             | int                   | 1 - 2.147.483.647       | -1                        |
+| channelKey 		 	|    YES   | String key that identifies a channel where not. will be displayed        | String                | channel must be enabled | basic_channel             |
+| title 			 	|     NO   | The title of notification                                                | String                | unlimited               |                           |
+| body 			 	    |     NO   | The body content of notification                                         | String                | unlimited               |                           |
+| summary 		 	    |     NO   | A summary to be displayed when the content is protected by privacy       | String                | unlimited               |                           |
+| showWhen 		 	    |     NO   | Hide/show the time elapsed since notification was displayed              | bool                  | true or false           | true                      |
+| largeIcon 		 	|     NO   | Large icon displayed at right middle of compact notification             | String                | unlimited               |                           |
+| bigPicture 		 	|     NO   | Big image displayed on expanded notification                             | String                | unlimited               |                           |
+| autoCancel 		 	|     NO   | Notification should auto cancel when gets tapped by the user             | bool                  | true or false           | true                      |
+| color 			 	|     NO   | Notification text color                                                  | Color                 | 0x00000000 to 0xFFFFFFFF| 0xFF000000 (Colors.black) |
+| backgroundColor  	    |     NO   | Notification background color                                            | Color                 | 0x00000000 to 0xFFFFFFFF| 0xFFFFFFFF (Colors.white) |
+| payload 		 	    |     NO   | Hidden payload content                                                   | Map<String, String>   | Only String for values  | null                      |
+| notificationLayout	|     NO   | Layout type of notification                                              | Enumerator            | NotificationLayout      | Default                   |
+| hideLargeIconOnExpand |     NO   | Hide/show the large icon when notification gets expanded                 | bool                  | true or false           | false                     |
+| locked 			    |     NO   | Blocks the user to dismiss the notification                              | bool                  | true or false           | false                     |
+| progress 			    |     NO   | Current value of progress bar (percentage). Null for indeterminate.      | int                   | 0 - 100                 | null                      |
+| ticker 			    |     NO   | Text to be displayed on top of the screen when a notification arrives    | String                | unlimited               |                           |
+
+<br>
+<br>
+
+### NotificationActionButton ("actionButtons" in Push data) - (optional)
+<br>
+
+* Is necessary at least one *required attribute
+
+| Attribute     | Required | Description                                                                   | Type                  | Value Limits             | Default value           |
+| ------------- | -------- | ----------------------------------------------------------------------------- | --------------------- | -----------------------  | ----------------------- |
+| key 		    |    YES   | Text key to identifies what action the user took when tapped the notification | String                | unlimited                |                         |
+| label 		|   *YES   | Text to be displayed over the action button                                   | String                | unlimited                |                         |
+| icon 		    |   *YES   | Icon to be displayed inside the button                                        | String                | must be a resource image |                         |
+| enabled 	    |     NO   | On Android, deactivates the button. On iOS, the button disappear              | bool                  | true or false            | true                    |
+| autoCancel    |     NO   | Notification should auto cancel when gets tapped by the user                  | bool                  | true or false            | true                    |
+| buttonType 	|     NO   | Button action response type                                                   | Enumerator            | ActionButtonType         | Default                 |
+
+<br>
+<br>
+
+### NotificationScheduleModel ("schedule" in Push data) - (optional)
+<br>
+
+* Is necessary at least one *required attribute
+* Cron expression must respect the format (with seconds precision) as described in [this article](https://www.baeldung.com/cron-expressions)
+
+| Attribute       	 | Required | Description                                                       | Type                               | Value Limits            | Default value   |
+| ------------------ | -------- | ----------------------------------------------------------------- | ---------------------------------- | ----------------------- | --------------- |
+| initialDateTime    |   *YES   | Mandatory initial notification fire date                          | String (YYYY-mm-dd HH:mi:ss)       | UTC valid date          |                 |
+| crontabSchedule    |   *YES   | Repetition cron rule expression                                   | Cron expression                    | valid cron expression   |                 |
+| allowWhileIdle     |     NO   | Displays the notification, even when the device is low battery    | bool                               | true or false           | false           |
+| preciseSchedule    |   *YES   | List of precise notification fire dates                           | List<String> (YYYY-mm-dd HH:mi:ss) | UTC valid dates         |                 |
 
 
